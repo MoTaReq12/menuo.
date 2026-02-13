@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>منيو المطعم</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --mustard: #f2b21b;
+            --mustard-dark: #d99610;
+
+            --bg: #f6f1e8;
+            --bg2: #f3eadc;
+
+            --paper: #fffaf2;
+            --paper2: #ffffff;
+
+            --text: #1b1b1b;
+            --muted: #6f6f6f;
+
+            --line: #eadfcd;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .08);
+
+            --radius: 18px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(180deg, var(--bg), var(--bg2));
+            color: var(--text);
+        }
+
+        /* ====== Header ====== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+
+            text-align: center;
+            padding: 22px 15px 14px;
+            background: linear-gradient(180deg, #fffaf2, #f7efe2);
+            border-bottom: 1px solid var(--line);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .06);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: .4px;
+        }
+
+        .header p {
+            margin: 6px 0 0;
+            font-size: .95rem;
+            color: var(--muted);
+        }
+
+        /* ====== Search ====== */
+        .top-tools {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-wrap {
+            position: relative;
+            width: min(520px, 92vw);
+        }
+
+        .search {
+            width: 100%;
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 999px;
+            padding: 12px 42px 12px 14px;
+            font-size: .95rem;
+            outline: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .05);
+        }
+
+        .search:focus {
+            border-color: #e3c88d;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, .08);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: .55;
+            font-size: 18px;
+        }
+
+        /* ====== Filters ====== */
+        .filters {
+            position: sticky;
+            top: 120px;
+            z-index: 150;
+
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 14px 15px;
+            background: linear-gradient(180deg, #fffaf2, #f7efe2);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn {
+            flex: 0 0 auto;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .78);
+            color: var(--text);
+            padding: 9px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: .9rem;
+            font-weight: 800;
+            transition: .22s;
+            white-space: nowrap;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .04);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            border-color: #e3c88d;
+        }
+
+        .filter-btn.active {
+            background: var(--mustard);
+            border-color: var(--mustard-dark);
+            color: #1a1a1a;
+        }
+
+        /* ====== Content ====== */
+        #menu-content {
+            padding-bottom: 80px;
+        }
+
+        /* ====== Section ====== */
+        .section {
+            padding: 22px 15px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+
+            font-size: 1.25rem;
+            font-weight: 900;
+            margin: 0 0 14px;
+            padding-right: 10px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            width: 52px;
+            height: 4px;
+            background: var(--mustard);
+            position: absolute;
+            bottom: -7px;
+            right: 0;
+            border-radius: 20px;
+        }
+
+        .section-count {
+            font-size: .85rem;
+            color: var(--muted);
+            font-weight: 800;
+        }
+
+        /* ====== Items Grid ====== */
+        .items-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        @media (min-width:900px) {
+            .items-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* ====== Menu Item ====== */
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+
+            background: linear-gradient(180deg, var(--paper), var(--paper2));
+            border: 1px solid rgba(234, 223, 205, .9);
+            border-radius: var(--radius);
+            padding: 14px;
+            box-shadow: var(--shadow);
+            transition: .25s;
+            overflow: hidden;
+
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        .menu-item.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .menu-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, .11);
+        }
+
+        .item-img {
+            width: 82px;
+            height: 82px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .12);
+            background: #eee;
+            flex: 0 0 auto;
+        }
+
+        .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .item-name {
+            font-weight: 900;
+            font-size: 1.03rem;
+            line-height: 1.25;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .item-price {
+            background: var(--mustard);
+            color: #1a1a1a;
+            font-weight: 900;
+            font-size: .9rem;
+            padding: 7px 12px;
+            border-radius: 999px;
+            white-space: nowrap;
+            box-shadow: 0 12px 24px rgba(242, 178, 27, .25);
+        }
+
+        .item-desc {
+            margin-top: 7px;
+            font-size: .88rem;
+            color: var(--muted);
+            line-height: 1.55;
+
+            max-height: 2.9em;
+            /* سطرين تقريبًا */
+            overflow: hidden;
+        }
+
+
+        /* ====== Loader (Skeleton) ====== */
+        #loader {
+            padding: 18px 15px 0;
+        }
+
+        .skeleton {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            padding: 22px 15px 60px;
+        }
+
+        @media (min-width:900px) {
+            .skeleton {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .skel-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 14px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 14px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .skel-img {
+            width: 82px;
+            height: 82px;
+            border-radius: 16px;
+            background: #eee;
+            flex: 0 0 auto;
+        }
+
+        .skel-lines {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 6px;
+        }
+
+        .skel-line {
+            height: 12px;
+            border-radius: 10px;
+            background: #eee;
+        }
+
+        .skel-line.w70 {
+            width: 70%;
+        }
+
+        .skel-line.w40 {
+            width: 40%;
+        }
+
+        .skel-line.w90 {
+            width: 90%;
+        }
+
+        .skel-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 1.2s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* ====== Back to top ====== */
+        #toTop {
+            position: fixed;
+            bottom: 18px;
+            left: 18px;
+            z-index: 500;
+
+            border: none;
+            background: var(--mustard);
+            color: #1a1a1a;
+            font-weight: 900;
+            border-radius: 999px;
+            padding: 12px 14px;
+            cursor: pointer;
+            box-shadow: 0 16px 35px rgba(242, 178, 27, .25);
+
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+            transition: .25s;
+        }
+
+        #toTop.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>اسم المطعم</h1>
+        <p>امسح الكود واستمتع بقائمتنا</p>
+
+        <div class="top-tools">
+            <div class="search-wrap">
+                <span class="search-icon">🔎</span>
+                <input id="search" class="search" type="text" placeholder="ابحث عن صنف... (مثال: برجر / فراخ)">
+            </div>
+        </div>
+    </div>
+
+    <div id="category-filters" class="filters"></div>
+
+    <div id="menu-content"></div>
+
+    <div id="loader"></div>
+
+    <button id="toTop" aria-label="الرجوع للأعلى">⬆️</button>
+
+    <script>
+        const SHEET_URL =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkh_74dCKAmyqcyMwpI_7GqoQ_fv9CWWiJo9d1MokUkEY4CuRh9e19frtztbPg6WA-hMm0BaQgh9D/pub?output=csv";
+
+        const els = {
+            filters: document.getElementById("category-filters"),
+            content: document.getElementById("menu-content"),
+            loader: document.getElementById("loader"),
+            search: document.getElementById("search"),
+            toTop: document.getElementById("toTop"),
+        };
+
+        function escapeHTML(str = "") {
+            return str
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function csvSplit(row) {
+            return row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        }
+
+        function normalize(str = "") {
+            return str.toLowerCase().trim();
+        }
+
+        function showSkeleton() {
+            els.loader.innerHTML = `
+        <div class="skeleton">
+          ${Array.from({ length: 8 })
+                    .map(
+                        () => `
+            <div class="skel-card">
+              <div class="skel-img"></div>
+              <div class="skel-lines">
+                <div class="skel-line w70"></div>
+                <div class="skel-line w40"></div>
+                <div class="skel-line w90"></div>
+              </div>
+            </div>
+          `
+                    )
+                    .join("")}
+        </div>
+      `;
+        }
+
+        function buildItemHTML(item) {
+            const name = escapeHTML(item.name);
+            const desc = escapeHTML(item.desc || "");
+            const price = escapeHTML(item.price);
+
+            const img =
+                item.img && item.img.length > 5 ? item.img : "https://via.placeholder.com/120";
+
+            return `
+        <div class="menu-item" data-name="${escapeHTML(item.name)}" data-desc="${escapeHTML(item.desc)}">
+          <img loading="lazy" src="${img}" class="item-img" alt="${name}">
+          <div class="item-info">
+            <div class="item-top">
+              <span class="item-name" title="${name}">${name}</span>
+              <span class="item-price">${price} ج.م</span>
+            </div>
+            <div class="item-desc">${desc}</div>
+          </div>
+        </div>
+      `;
+        }
+
+        function buildSection(catName, items) {
+            const section = document.createElement("div");
+            section.className = "section";
+            section.setAttribute("data-cat", catName);
+
+            section.innerHTML = `
+        <div class="section-title">
+          <span>${escapeHTML(catName)}</span>
+          <span class="section-count">${items.length} صنف</span>
+        </div>
+        <div class="items-grid">
+          ${items.map(buildItemHTML).join("")}
+        </div>
+      `;
+
+            return section;
+        }
+
+        function setupAnimations() {
+            const cards = document.querySelectorAll(".menu-item");
+
+            const io = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((e) => {
+                        if (e.isIntersecting) {
+                            e.target.classList.add("is-visible");
+                            io.unobserve(e.target);
+                        }
+                    });
+                },
+                { threshold: 0.15 }
+            );
+
+            cards.forEach((c) => io.observe(c));
+        }
+
+        function setupFilterButtons() {
+            const buttons = document.querySelectorAll(".filter-btn");
+            const sections = document.querySelectorAll(".section");
+
+            buttons.forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    document.querySelector(".filter-btn.active")?.classList.remove("active");
+                    btn.classList.add("active");
+
+                    const cat = btn.getAttribute("data-cat");
+
+                    sections.forEach((sec) => {
+                        sec.style.display =
+                            cat === "all" || sec.getAttribute("data-cat") === cat ? "block" : "none";
+                    });
+
+                    // يرجع لفوق بسلاسة
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+
+                    // بعد الفلترة شغل الأنيميشن من جديد للعناصر الظاهرة
+                    setupAnimations();
+                });
+            });
+        }
+
+        function setupSearch() {
+            els.search.addEventListener("input", () => {
+                const q = normalize(els.search.value);
+
+                const items = document.querySelectorAll(".menu-item");
+                const sections = document.querySelectorAll(".section");
+
+                items.forEach((item) => {
+                    const name = normalize(item.getAttribute("data-name") || "");
+                    const desc = normalize(item.getAttribute("data-desc") || "");
+                    const match = name.includes(q) || desc.includes(q);
+
+                    item.style.display = match ? "flex" : "none";
+                });
+
+                // اخفاء السكشن لو مفيهوش عناصر ظاهرة
+                sections.forEach((sec) => {
+                    const visible = sec.querySelectorAll(".menu-item:not([style*='display: none'])").length;
+                    sec.style.display = visible ? "block" : "none";
+                });
+
+                // لو فيه بحث، شيل active من الفلتر
+                if (q.length > 0) {
+                    document.querySelector(".filter-btn.active")?.classList.remove("active");
+                } else {
+                    // لو البحث فاضي رجع "الكل"
+                    const allBtn = document.querySelector('.filter-btn[data-cat="all"]');
+                    allBtn?.classList.add("active");
+                    sections.forEach((sec) => (sec.style.display = "block"));
+                }
+
+                setupAnimations();
+            });
+        }
+
+        function setupToTop() {
+            window.addEventListener("scroll", () => {
+                if (window.scrollY > 700) els.toTop.classList.add("show");
+                else els.toTop.classList.remove("show");
+            });
+
+            els.toTop.addEventListener("click", () => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+        }
+
+        async function loadMenu() {
+            try {
+                showSkeleton();
+
+                const response = await fetch(SHEET_URL);
+                const data = await response.text();
+
+                const rows = data.split(/\r?\n/).slice(1);
+                const categories = {};
+
+                rows.forEach((row) => {
+                    const cols = csvSplit(row);
+
+                    if (cols.length >= 2) {
+                        const name = (cols[0] || "").replace(/"/g, "").trim();
+                        const price = (cols[1] || "").replace(/"/g, "").trim();
+                        const img = (cols[2] || "").replace(/"/g, "").trim();
+                        const cat = (cols[3] || "أصناف متنوعة").replace(/"/g, "").trim();
+                        const desc = (cols[4] || "").replace(/"/g, "").trim();
+
+                        if (!name) return;
+
+                        if (!categories[cat]) categories[cat] = [];
+                        categories[cat].push({ name, price, img, desc });
+                    }
+                });
+
+                // الفلاتر
+                els.filters.innerHTML = `<button class="filter-btn active" data-cat="all">الكل</button>`;
+
+                // المحتوى
+                els.content.innerHTML = "";
+                Object.keys(categories).forEach((catName) => {
+                    els.filters.innerHTML += `<button class="filter-btn" data-cat="${escapeHTML(catName)}">${escapeHTML(catName)}</button>`;
+                    els.content.appendChild(buildSection(catName, categories[catName]));
+                });
+
+                // اخفاء اللودر
+                els.loader.innerHTML = "";
+
+                setupFilterButtons();
+                setupAnimations();
+                setupSearch();
+                setupToTop();
+            } catch (e) {
+                els.loader.innerHTML = `
+          <div style="padding:25px 15px; color:#b33; font-weight:900;">
+            حدث خطأ أثناء تحميل البيانات
+          </div>
+        `;
+            }
+        }
+
+        loadMenu();
+    </script>
+
+</body>
+
+</html>
